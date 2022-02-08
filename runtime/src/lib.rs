@@ -347,6 +347,7 @@ impl pallet_ethereum::Config for Runtime {
 	type StateRoot = pallet_ethereum::IntermediateStateRoot;
 }
 
+
 parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * ICY;
 }
@@ -388,19 +389,7 @@ parameter_types! {
 	pub const SpendPeriod: BlockNumber = 1 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(1);
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
-
-	pub const TipCountdown: BlockNumber = 1 * DAYS;
-	pub const TipFindersFee: Percent = Percent::from_percent(20);
-	pub const TipReportDepositBase: Balance = 1 * ICY;
-	pub const DataDepositPerByte: Balance = 10 * MILLIICY;
-  
-	pub const MaximumReasonLength: u32 = 16384;
 	pub const MaxApprovals: u32 = 100;
-	pub const BountyDepositBase: Balance = 1 * ICY;
-	pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
-	pub const BountyUpdatePeriod: BlockNumber = 7 * DAYS;
-	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
-	pub const BountyValueMinimum: Balance = 5 * ICY;
 }
 
 impl pallet_treasury::Config for Runtime {
