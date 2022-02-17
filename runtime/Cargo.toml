@@ -39,8 +39,11 @@ pallet-timestamp = { default-features = false, git = "https://github.com/parityt
 pallet-transaction-payment = { default-features = false, git = "https://github.com/paritytech/substrate" }
 pallet-transaction-payment-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/substrate" }
 
-pallet-collective = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate" }
 pallet-assets = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-collective = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-democracy = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-elections-phragmen = { version = "5.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git" }
+pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git" }
 pallet-treasury = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate" }
 pallet-vesting = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate" }
 
@@ -103,6 +106,9 @@ std = [
 	"pallet-vesting/std",
 	"pallet-treasury/std",
 	"pallet-collective/std",
+	"pallet-democracy/std",
+	"pallet-scheduler/std",
+	"pallet-elections-phragmen/std",
 
 	"sp-api/std",
 	"sp-block-builder/std",

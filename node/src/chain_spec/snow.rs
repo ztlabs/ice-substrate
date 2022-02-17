@@ -233,6 +233,9 @@ fn testnet_genesis(
 				],
 			phantom: PhantomData,
 		},
-		treasury: Default::default(),
+		democracy: Default::default(),
+		elections_phragmen: Default::default(),
+		technical_committee: Default::default(),
+		treasury: Default::default(),	
 	}
 }

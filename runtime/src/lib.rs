@@ -26,7 +26,7 @@ use sp_runtime::{
 		PostDispatchInfoOf, Verify, ConvertInto 
 	},
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
-	ApplyExtrinsicResult, MultiSignature, Percent,
+	ApplyExtrinsicResult, MultiSignature,
 };
 use sp_std::{marker::PhantomData, prelude::*};
 #[cfg(feature = "std")]
@@ -35,16 +35,18 @@ use sp_version::RuntimeVersion;
 
 use frame_support::inherent::Vec;
 use sp_std::boxed::Box;
-use sp_core::u32_trait::{_1, _2, _5};
+use sp_core::u32_trait::{_1, _2, _4, _5};
 
 use crate::currency::{ICY, MILLIICY};
+
+use frame_system::{EnsureOneOf, EnsureRoot};
 
 
 // A few exports that help ease life for downstream crates.
 use fp_rpc::TransactionStatus;
 pub use frame_support::{
 	construct_runtime, parameter_types,
-	traits::{FindAuthor, KeyOwnerProofSystem, Randomness},
+	traits::{FindAuthor, KeyOwnerProofSystem, LockIdentifier, Randomness, U128CurrencyToVote},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 		IdentityFee, Weight,
@@ -364,7 +366,25 @@ impl pallet_vesting::Config for Runtime {
 }
 
 
-// Treasury Pallet
+pub const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
+
+parameter_types! {
+	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(10) * MAXIMUM_BLOCK_WEIGHT;
+	pub const MaxScheduledPerBlock: u32 = 50;
+}
+
+// democracy
+impl pallet_scheduler::Config for Runtime {
+	type Event = Event;
+	type Origin = Origin;
+	type Call = Call;
+	type MaximumWeight = MaximumSchedulerWeight;
+	type PalletsOrigin = OriginCaller;
+	type ScheduleOrigin = EnsureRoot<AccountId>;
+	type MaxScheduledPerBlock = MaxScheduledPerBlock;
+	type WeightInfo = pallet_scheduler::weights::SubstrateWeight<Runtime>;
+}
+
 parameter_types! {
 	pub const CouncilMotionDuration: BlockNumber = 3 * DAYS;
 	pub const CouncilMaxProposals: u32 = 100;
@@ -381,6 +401,126 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 	type MaxMembers = GeneralCouncilMaxMembers;
 	type DefaultVote = pallet_collective::PrimeDefaultVote;
 	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
+}
+
+parameter_types! {
+	pub const TechnicalMotionDuration: BlockNumber = 3 * DAYS;
+	pub const TechnicalMaxProposals: u32 = 100;
+	pub const TechnicalMaxMembers:u32 = 100;
+}
+
+type TechnicalCollective = pallet_collective::Instance2;
+impl pallet_collective::Config<TechnicalCollective> for Runtime {
+	type Origin = Origin;
+	type Proposal = Call;
+	type Event = Event;
+	type MotionDuration = TechnicalMotionDuration;
+	type MaxProposals = TechnicalMaxProposals;
+	type MaxMembers = TechnicalMaxMembers;
+	type DefaultVote = pallet_collective::PrimeDefaultVote;
+	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
+}
+
+parameter_types! {
+	pub const LaunchPeriod: BlockNumber = 7 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 7 * MINUTES;
+	pub const FastTrackVotingPeriod: BlockNumber = 1 * MINUTES;
+	pub const MinimumDeposit: Balance = 100 * ICY;
+	pub const EnactmentPeriod: BlockNumber = 8 * MINUTES;
+	pub const CooloffPeriod: BlockNumber = 7 * MINUTES;
+	// One cent: $10,000 / MB
+	pub const PreimageByteDeposit: Balance = 10 * MILLIICY;
+	pub const InstantAllowed: bool = false;
+	pub const MaxVotes: u32 = 100;
+	pub const MaxProposals: u32 = 100;
+}
+
+impl pallet_democracy::Config for Runtime {
+	type Proposal = Call;
+	type Event = Event;
+	type Currency = Balances;
+	type EnactmentPeriod = EnactmentPeriod;
+	type LaunchPeriod = LaunchPeriod;
+	type VotingPeriod = VotingPeriod;
+	type VoteLockingPeriod = EnactmentPeriod;
+	type MinimumDeposit = MinimumDeposit;
+	/// A straight majority of the council can decide what their next motion is.
+	type ExternalOrigin =
+		pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>;
+	/// A super-majority can have the next scheduled referendum be a straight
+	/// majority-carries vote.
+	type ExternalMajorityOrigin =
+		pallet_collective::EnsureProportionAtLeast<_4, _5, AccountId, CouncilCollective>;
+	/// A unanimous council can have the next scheduled referendum be a straight
+	/// default-carries (NTB) vote.
+	type ExternalDefaultOrigin =
+		pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>;
+	/// Full of the technical committee can have an
+	/// ExternalMajority/ExternalDefault vote be tabled immediately and with a
+	/// shorter voting/enactment period.
+	type FastTrackOrigin =
+		pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, TechnicalCollective>;
+	type InstantOrigin = frame_system::EnsureNever<AccountId>;
+	type InstantAllowed = InstantAllowed;
+	type FastTrackVotingPeriod = FastTrackVotingPeriod;
+	/// To cancel a proposal which has been passed, all of the council must
+	/// agree to it.
+	type CancellationOrigin =
+		pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>;
+	type CancelProposalOrigin = EnsureOneOf<
+		AccountId,
+		EnsureRoot<AccountId>,
+		pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, TechnicalCollective>,
+	>;
+	type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
+	type BlacklistOrigin = EnsureRoot<AccountId>;
+	/// Any single technical committee member may veto a coming council
+	/// proposal, however they can only do it once and it lasts only for the
+	/// cooloff period.
+	type VetoOrigin = pallet_collective::EnsureMember<AccountId, TechnicalCollective>;
+	type CooloffPeriod = CooloffPeriod;
+	type PreimageByteDeposit = PreimageByteDeposit;
+	type Slash = Treasury;
+	type Scheduler = Scheduler;
+	type MaxVotes = MaxVotes;
+	type PalletsOrigin = OriginCaller;
+	type WeightInfo = pallet_democracy::weights::SubstrateWeight<Runtime>;
+	type MaxProposals = MaxProposals;
+}
+
+pub const fn deposit(items: u32, bytes: u32) -> Balance {
+    items as Balance * 15 * ICY + (bytes as Balance) * 6 * ICY
+}
+
+parameter_types! {
+  pub const CandidacyBond: Balance = 1 * ICY;
+  // 1 storage item created, key size is 32 bytes, value size is 16+16.
+  pub const VotingBondBase: Balance = deposit(1, 64);
+  // additional data per vote is 32 bytes (account id).
+  pub const VotingBondFactor: Balance = deposit(0, 32);
+  /// Daily council elections.
+  pub const TermDuration: BlockNumber = 3 * DAYS;
+  pub const DesiredMembers: u32 = 7;
+  pub const DesiredRunnersUp: u32 = 30;
+  pub const ElectionsPhragmenPalletId: LockIdentifier = *b"phrelect";
+}
+
+impl pallet_elections_phragmen::Config for Runtime {
+    type Event = Event;
+    type Currency = Balances;
+    type ChangeMembers = Council;
+    type InitializeMembers = Council;
+    type CurrencyToVote = U128CurrencyToVote;
+    type CandidacyBond = CandidacyBond;
+    type VotingBondBase = VotingBondBase;
+    type VotingBondFactor = VotingBondFactor;
+    type LoserCandidate = Treasury;
+    type KickedMember = Treasury;
+    type DesiredMembers = DesiredMembers;
+    type DesiredRunnersUp = DesiredRunnersUp;
+    type TermDuration = TermDuration;
+    type PalletId = ElectionsPhragmenPalletId;
+    type WeightInfo = pallet_elections_phragmen::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -408,6 +548,7 @@ impl pallet_treasury::Config for Runtime {
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type MaxApprovals = MaxApprovals;
 }
+
 
 frame_support::parameter_types! {
 	pub BoundDivision: U256 = U256::from(1024);
@@ -464,8 +605,14 @@ construct_runtime!(
 		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Config, Inherent},
 		BaseFee: pallet_base_fee::{Pallet, Call, Storage, Config<T>, Event},
 		Vesting: pallet_vesting::{Pallet, Call, Storage, Config<T>, Event<T>},
+		// Governance.
+		Democracy: pallet_democracy::{Pallet, Call, Storage, Config<T>, Event<T>},
+		ElectionsPhragmen: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>},
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
+		TechnicalCommittee: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>}, 
 		Treasury: pallet_treasury::{Pallet, Call, Storage, Event<T>, Config},
+		// Utility module.
+		Scheduler: pallet_scheduler::{Pallet, Call, Storage, Event<T>},
 	}
 );
 
