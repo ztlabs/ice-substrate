@@ -422,12 +422,12 @@ impl pallet_collective::Config<TechnicalCollective> for Runtime {
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 7 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 7 * MINUTES;
-	pub const FastTrackVotingPeriod: BlockNumber = 1 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = 7 * DAYS;
+	pub const VotingPeriod: BlockNumber = 7 * DAYS;
+	pub const FastTrackVotingPeriod: BlockNumber = 1 * DAYS;
 	pub const MinimumDeposit: Balance = 100 * ICY;
-	pub const EnactmentPeriod: BlockNumber = 8 * MINUTES;
-	pub const CooloffPeriod: BlockNumber = 7 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = 8 * DAYS;
+	pub const CooloffPeriod: BlockNumber = 7 * DAYS;
 	// One cent: $10,000 / MB
 	pub const PreimageByteDeposit: Balance = 10 * MILLIICY;
 	pub const InstantAllowed: bool = false;

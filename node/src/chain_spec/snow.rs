@@ -4,10 +4,10 @@ use ice_runtime::{
 };
 use sc_service::ChainType;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public, H160, U256};
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
-use std::{collections::BTreeMap, str::FromStr};
+use std::{collections::BTreeMap};
 use hex_literal::hex;
 use std::marker::PhantomData;
 
@@ -70,6 +70,10 @@ pub fn testnet_config() -> Result<ChainSpec, String> {
 						hex!["85ec524aeacb6e558619a10da82cdf787026209211d1b7462cb176d58f2add86"].unchecked_into()
 					)
 				],
+				// Council members
+				vec![
+					hex!["62687296bffd79f12178c4278b9439d5eeb8ed7cc0b1f2ae29307e806a019659"].into()
+				],
 				// Sudo account
 				hex!["62687296bffd79f12178c4278b9439d5eeb8ed7cc0b1f2ae29307e806a019659"].into(),
 				// Pre-funded accounts
@@ -108,6 +112,10 @@ pub fn development_config() -> Result<ChainSpec, String> {
 				wasm_binary,
 				// Initial PoA authorities
 				vec![authority_keys_from_seed("Alice")],
+				// Council members
+				vec![
+					get_account_id_from_seed::<sr25519::Public>("Alice")
+				],
 				// Sudo account
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				// Pre-funded accounts
@@ -150,6 +158,10 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 					authority_keys_from_seed("Alice"),
 					authority_keys_from_seed("Bob"),
 				],
+				// Council members
+				vec![
+					get_account_id_from_seed::<sr25519::Public>("Alice")
+				],
 				// Sudo account
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				// Pre-funded accounts
@@ -187,6 +199,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 fn testnet_genesis(
 	wasm_binary: &[u8],
 	initial_authorities: Vec<(AuraId, GrandpaId)>,
+	council_members: Vec<AccountId>,
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
 	_enable_println: bool,
@@ -228,9 +241,7 @@ fn testnet_genesis(
 		base_fee: Default::default(),
 		vesting:Default::default(),
 		council: CouncilConfig {
-			members: vec![ 
-					hex!["62687296bffd79f12178c4278b9439d5eeb8ed7cc0b1f2ae29307e806a019659"].into(), 
-				],
+			members: council_members,
 			phantom: PhantomData,
 		},
 		democracy: Default::default(),
