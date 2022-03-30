@@ -75,26 +75,18 @@ fn check_vesting_status() {
 	});
 }
 
-	
+
 #[test]
-fn redeem_vesting(fromAccount: u64, newAccount:u64, amount: T::Balance) {
-	ExtBuilder::default().existential_deposit(ED).build().execute_with(|| {
-		Balances::transfer(fromAccount, newAccount, amount);
-		let user1_free_balance = Balances::free_balance(&newAccount);
-		assert_eq!(newAccount, amount);
-		assert_eq!(Balances::transfer(Some(1).into(), 2, 55));
-		let user1_vesting_schedule = pallet_vesting::VestingInfo::new(
-			ED * 5,
-			128, // Vesting over 10 blocks
-			0,
-		);
-		assert_eq!(Vesting::vesting(&newAccount).unwrap(), vec![user1_vesting_schedule])
-
-		System::set_block_number(10);
-		assert_eq!(System::block_number(), 10);
-
-		System::set_block_number(30);
-		assert_eq!(System::block_number(), 30);
-		vest_and_assert_no_vesting::<Test>(1);
-	}
+fn unvested_balance_should_not_transfer() {
+	ExtBuilder::default().existential_deposit(10).build().execute_with(|| {
+		let user1_free_balance = Balances::free_balance(&1);
+		assert_eq!(user1_free_balance, 100); // Account 1 has free balance
+									 // Account 1 has only 5 units vested at block 1 (plus 50 unvested)
+		assert_eq!(Vesting::vesting_balance(&1), Some(45));
+		assert_noop!(
+			Balances::transfer(Some(1).into(), 2, 56),
+			pallet_balances::Error::<Test, _>::LiquidityRestrictions,
+		); // Account 1 cannot send more than vested amount
+	});
 }
+
