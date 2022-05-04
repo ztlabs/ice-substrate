@@ -25,6 +25,6 @@ Symbol       : AMAX
 To convert eth 20bytes address to polkadot 32bytes account, run:
 
 ```
-$ ./target/debug/amax-eva eth-to-polkadot 0xD948CC6216fAb1CF0606320E6E71317ABefd5733
+$ ./target/release/amax-eva eth-to-polkadot 0xD948CC6216fAb1CF0606320E6E71317ABefd5733
 0x369ece7733d6fa291d72f2f58bef0bc966351528a75bb929bc3532b7fa164492 (5DJKcpHS...)
 ```
