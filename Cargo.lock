@@ -168,6 +168,7 @@ dependencies = [
  "sp-keystore 0.12.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.19)",
  "sp-offchain",
  "sp-runtime 6.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.19)",
+ "sp-serializer",
  "sp-session",
  "sp-timestamp",
  "sp-transaction-pool",

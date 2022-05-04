@@ -41,7 +41,7 @@ sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "polk
 sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
 sp-timestamp = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
-
+sp-serializer = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
 
 sc-executor = { branch = "polkadot-v0.9.19", git = "https://github.com/paritytech/substrate", features = ["wasmtime"] }
 sc-service = { branch = "polkadot-v0.9.19", git = "https://github.com/paritytech/substrate", features = ["wasmtime"] }

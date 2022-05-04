@@ -1,6 +1,12 @@
 use clap::Parser;
-use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
+use sc_cli::{KeySubcommand, SignCmd, VanityCmd, Result, VerifyCmd};
 use std::path::PathBuf;
+
+use sp_serializer;
+use pallet_evm::{HashedAddressMapping, AddressMapping};
+use sp_runtime::traits::{BlakeTwo256};
+use frost_runtime::{AccountId};
+
 
 /// An overarching CLI command definition.
 #[derive(Debug, clap::Parser)]
@@ -78,7 +84,34 @@ pub enum Subcommand {
 
 	/// Revert the chain to a previous state.
 	Revert(sc_cli::RevertCmd),
+
+    //convert eth 20bytes address to polkadot 32bytes account
+    EthToPolkadot(AddressConvertCmd)
 }
+
+/// The `verify` command
+#[derive(Debug, Clone, Parser)]
+#[clap(
+    name = "eth-to-polkadot",
+    about = "convert eth 20bytes address to polkadot 32bytes account"
+)]
+pub struct AddressConvertCmd {
+    /// eth address 20bytes
+    eth20: String,
+}
+
+impl AddressConvertCmd {
+    /// Run the command
+    pub fn run(&self) -> Result<()>  {
+
+        let h160 = sp_serializer::from_str(&format!("{:?}", self.eth20)).unwrap();
+        let account_id = <HashedAddressMapping<BlakeTwo256> as AddressMapping<AccountId>>::into_account_id(h160);
+        println!("0x{:?}",account_id);
+
+        Ok(())
+    }
+}
+
 
 /// Command for exporting the genesis state of the parachain
 #[derive(Debug, clap::Parser)]

@@ -420,6 +420,7 @@ pub fn run() -> Result<()> {
         Some(Subcommand::Sign(cmd)) => cmd.run(),
         Some(Subcommand::Verify(cmd)) => cmd.run(),
         Some(Subcommand::Vanity(cmd)) => cmd.run(),
+        Some(Subcommand::EthToPolkadot(cmd)) => cmd.run(),
         #[cfg(feature = "try-runtime")]
         Some(Subcommand::TryRuntime(cmd)) => {
             let runner = cli.create_runner(cmd)?;
