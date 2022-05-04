@@ -13,11 +13,12 @@ To execute the chain, run:
 $ ./target/release/amax-eva --tmp --ws-external --rpc-external --rpc-cors all --dev
 ```
 
-Metamask network setting:
+Configuring Metamask
 
 ```
-rpc url : http://127.0.0.1:9933
-chainid : 1998
-symbol  : AMAX
+Network Name: amax-eva local node
+RPC URL : http://127.0.0.1:9933
+ChainID : 1998
+Symbol  : AMAX
 ```
 
