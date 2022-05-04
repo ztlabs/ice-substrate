@@ -575,7 +575,7 @@ impl pallet_simple_inflation::Beneficiary<NegativeImbalance> for Beneficiary {
 }
 
 parameter_types! {
-    pub const IssuingAmount: Balance = 10 * AMAX;
+    pub const IssuingAmount: Balance = 0 * AMAX;
 }
 
 impl pallet_simple_inflation::Config for Runtime {
