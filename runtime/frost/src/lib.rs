@@ -44,7 +44,7 @@ use frame_support::inherent::Vec;
 use sp_std::boxed::Box;
 use smallvec::smallvec;
 
-use crate::currency::{ICY};
+use crate::currency::{AMAX};
 
 pub mod constants;
 pub mod impls;
@@ -161,11 +161,11 @@ pub mod currency {
 	use crate::Balance;
 
 	/// Constant values for the base number of indivisible units for balances
-	pub const MILLIICY: Balance = 1_000_000_000_000_000;
-	pub const ICY: Balance = 1_000 * MILLIICY;
+	pub const MILLIAMAX: Balance = 1_000_000_000_000_000;
+	pub const AMAX: Balance = 1_000 * MILLIAMAX;
 
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
-		(items as Balance + bytes as Balance) * MILLIICY / 1_000_000
+		(items as Balance + bytes as Balance) * MILLIAMAX / 1_000_000
 	}
 }
 
@@ -411,7 +411,7 @@ where
 }
 
 parameter_types! {
-	pub const TransactionByteFee: Balance = 1 * ICY;
+	pub const TransactionByteFee: Balance = 1 * AMAX;
 	pub OperationalFeeMultiplier: u8 = 5;
 	// Used with LinearWeightToFee conversion.
     pub const FeeWeightRatio: u128 = 1_000;
@@ -541,7 +541,7 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
-	pub const ProposalBondMinimum: Balance = 1 * ICY;
+	pub const ProposalBondMinimum: Balance = 1 * AMAX;
 	pub const SpendPeriod: BlockNumber = 1 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(1);
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
@@ -575,7 +575,7 @@ impl pallet_simple_inflation::Beneficiary<NegativeImbalance> for Beneficiary {
 }
 
 parameter_types! {
-    pub const IssuingAmount: Balance = 10 * ICY;
+    pub const IssuingAmount: Balance = 10 * AMAX;
 }
 
 impl pallet_simple_inflation::Config for Runtime {

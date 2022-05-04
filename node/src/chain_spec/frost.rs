@@ -1,6 +1,6 @@
 use frost_runtime::{
 	AccountId, AuraConfig, BalancesConfig, CouncilConfig, EVMConfig, EthereumConfig, GenesisConfig, GrandpaConfig,
-	Signature, SudoConfig, SystemConfig, WASM_BINARY, currency::ICY, SessionConfig, opaque::SessionKeys, PalletId
+	Signature, SudoConfig, SystemConfig, WASM_BINARY, currency::AMAX, SessionConfig, opaque::SessionKeys, PalletId
 };
 use sc_service::ChainType;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -17,7 +17,7 @@ const FROST_PROPERTIES: &str = r#"
         {
             "ss58Format": 42,
             "tokenDecimals": 18,
-            "tokenSymbol": "ICZ"
+            "tokenSymbol": "AMAX"
         }"#;
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
@@ -240,7 +240,7 @@ fn testnet_genesis(
 			balances: endowed_accounts
 				.iter()
 				.cloned()
-				.map(|k| (k, ICY * 40_000))
+				.map(|k| (k, AMAX * 40_000))
 				.collect()
 		},
 		aura: AuraConfig {
