@@ -128,9 +128,9 @@ pub fn development_config() -> Result<FrostChainSpec, String> {
 				vec![
 					TREASURY_PALLET_ID.into_account(),
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
-					get_account_id_from_seed::<sr25519::Public>("Bob"),
-					get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+					// get_account_id_from_seed::<sr25519::Public>("Bob"),
+					// get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+					// get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
 				],
 				true,
 			)
@@ -240,7 +240,7 @@ fn testnet_genesis(
 			balances: endowed_accounts
 				.iter()
 				.cloned()
-				.map(|k| (k, AMAX * 40_000))
+				.map(|k| (k, AMAX * 1_000_000))
 				.collect()
 		},
 		aura: AuraConfig {
