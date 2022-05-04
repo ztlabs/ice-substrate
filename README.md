@@ -13,7 +13,7 @@ To execute the chain, run:
 $ ./target/release/amax-eva --tmp --ws-external --rpc-external --rpc-cors all --dev
 ```
 
-metamask setting:
+Metamask network setting:
 
 ```
 rpc url : http://127.0.0.1:9933
