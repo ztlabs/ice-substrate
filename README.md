@@ -16,9 +16,9 @@ $ ./target/release/amax-eva --tmp --ws-external --rpc-external --rpc-cors all --
 Configuring Metamask
 
 ```
-Network Name: amax-eva local node
-RPC URL : http://127.0.0.1:9933
-ChainID : 1998
-Symbol  : AMAX
+Network Name : amax-eva local node
+RPC URL      : http://127.0.0.1:9933
+ChainID      : 1998
+Symbol       : AMAX
 ```
 
